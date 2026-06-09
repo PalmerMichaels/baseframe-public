@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
-import { scenarios } from "../src/data.ts";
+import { cleanRoomDisclaimer, scenarios } from "../src/data.ts";
 import { createFrame } from "../src/frame.ts";
 
 const ids = new Set<string>();
+
+assert.match(cleanRoomDisclaimer, /fictional synthetic/i);
+assert.match(cleanRoomDisclaimer, /No affiliation/i);
+assert.match(cleanRoomDisclaimer, /Not for regulated/i);
 
 for (const scenario of scenarios) {
   assert.match(scenario.id, /^[a-z0-9-]+$/);
@@ -15,6 +19,7 @@ for (const scenario of scenarios) {
   const frame = createFrame(scenario.id);
   assert.equal(frame.assessments.length, scenario.workstreams.length);
   assert.ok(frame.cadence.length >= 3, `${scenario.id} must produce a useful cadence`);
+  assert.equal(frame.disclaimer, cleanRoomDisclaimer);
 
   for (const workstream of scenario.workstreams) {
     assert.ok(workstream.owner.length > 0, `${scenario.id} workstream needs an owner`);

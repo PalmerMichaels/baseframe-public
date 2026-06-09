@@ -19,11 +19,12 @@ Commands:
 ## Validation
 
 ```bash
+npm run build
 npm test
 npm run validate
 ```
 
-The test suite uses Node's built-in test runner. The validation script checks scenario identifiers, score ranges, synthetic-data markers, and generated frame shape.
+The build script type-checks the TypeScript source. The test suite uses Node's built-in test runner. The validation script checks scenario identifiers, score ranges, synthetic-data markers, generated frame shape, and clean-room disclaimer text.
 
 ## Synthetic Data
 
@@ -36,6 +37,8 @@ This is a clean-room public implementation. It does not include proprietary code
 ## Non-Regulated Disclaimer
 
 This tool is for planning demonstrations only. It is not medical, legal, financial, compliance, operational, or other regulated professional advice.
+
+The CLI text and JSON output also include this clean-room/non-regulated-use disclaimer.
 
 ## No Affiliation
 

@@ -20,6 +20,7 @@ describe("baseframe operating frames", () => {
     assert.ok(frame.overallReadiness >= 0 && frame.overallReadiness <= 100);
     assert.equal(frame.assessments[0].name, "Observability");
     assert.ok(frame.nextActions[0].includes("Leah"));
+    assert.match(frame.disclaimer, /fictional synthetic/);
   });
 
   it("rejects unknown scenarios", () => {

@@ -41,6 +41,9 @@ function formatFrame(frame: OperatingFrame): string {
     ...frame.cadence.map((ritual) => `- ${ritual}`),
     "",
     "Next actions:",
-    ...frame.nextActions.map((action) => `- ${action}`)
+    ...frame.nextActions.map((action) => `- ${action}`),
+    "",
+    "Disclaimer:",
+    frame.disclaimer
   ].join("\n");
 }

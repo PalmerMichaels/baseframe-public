@@ -20,6 +20,9 @@ export type Scenario = {
   workstreams: Workstream[];
 };
 
+export const cleanRoomDisclaimer =
+  "Clean-room demo using fictional synthetic launch-planning data only. No affiliation with any real company, accelerator, or YC. Not for regulated, legal, medical, financial, safety-critical, or production decisions.";
+
 export const scenarios: Scenario[] = [
   {
     id: "atlas-beta",

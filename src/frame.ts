@@ -1,4 +1,4 @@
-import { scenarios, type Scenario, type Workstream } from "./data.ts";
+import { cleanRoomDisclaimer, scenarios, type Scenario, type Workstream } from "./data.ts";
 
 export type WorkstreamAssessment = {
   name: string;
@@ -17,6 +17,7 @@ export type OperatingFrame = {
   cadence: string[];
   assessments: WorkstreamAssessment[];
   nextActions: string[];
+  disclaimer: string;
 };
 
 export function listScenarios(): Pick<Scenario, "id" | "name" | "horizonDays" | "audience">[] {
@@ -49,7 +50,8 @@ export function createFrame(scenarioId: string): OperatingFrame {
     overallReadiness,
     cadence: chooseCadence(overallReadiness, scenario.horizonDays),
     assessments,
-    nextActions: assessments.slice(0, 3).map((assessment) => `${assessment.owner}: ${assessment.focus}`)
+    nextActions: assessments.slice(0, 3).map((assessment) => `${assessment.owner}: ${assessment.focus}`),
+    disclaimer: cleanRoomDisclaimer
   };
 }
 
