@@ -1,25 +1,24 @@
 import assert from "node:assert/strict";
-import { scoreAll, scoreProject } from "./core.js";
-import { seedProjects } from "./data.js";
+import { assessInitiative, summarizePortfolio } from "./core.js";
+import { cleanRoomNotice, initiatives } from "./data.js";
 
-assert.equal(seedProjects.length, 3, "expected three synthetic seed projects");
+assert.equal(initiatives.length, 4, "expected four synthetic seed initiatives");
+assert.match(cleanRoomNotice, /synthetic data only/i);
+assert.match(cleanRoomNotice, /not a regulated/i);
 
-for (const project of seedProjects) {
-  assert.match(project.id, /^[a-z0-9-]+$/, `project id should be slug-like: ${project.id}`);
-  assert.ok(project.name.length > 0, "project name is required");
-  assert.ok(project.owner.startsWith("Demo Team"), "owners must be fabricated demo teams");
-  assert.ok(project.checklist.length >= 4, "each project needs a complete readiness checklist");
+for (const initiative of initiatives) {
+  assert.match(initiative.id, /^BF-\d+$/, `initiative id should use demo format: ${initiative.id}`);
+  assert.ok(initiative.name.length > 0, "initiative name is required");
+  assert.ok(initiative.owner.length > 0, "owner is required");
+  assert.ok(initiative.confidence >= 0 && initiative.confidence <= 1, "confidence must be normalized");
+  assert.ok(initiative.impact >= 1 && initiative.impact <= 10, "impact must be bounded");
+  assert.ok(initiative.effort >= 1 && initiative.effort <= 10, "effort must be bounded");
 
-  const score = scoreProject(project);
-  assert.ok(score.totalWeight > 0, "total checklist weight must be positive");
-  assert.ok(score.score >= 0 && score.score <= 100, "score must be between 0 and 100");
+  const assessment = assessInitiative(initiative);
+  assert.ok(assessment.score >= 0, "score must be non-negative");
 }
 
-const ordered = scoreAll();
-assert.deepEqual(
-  ordered.map((score) => score.project.id),
-  ["signal-canvas", "atlas-notes", "garden-grid"],
-  "summary should be sorted by readiness score descending"
-);
+const ordered = summarizePortfolio(initiatives, cleanRoomNotice, "2026-01-01T00:00:00.000Z");
+assert.deepEqual(ordered.items.map((item) => item.id), ["BF-137", "BF-101", "BF-118", "BF-124"], "summary should be sorted by score descending");
 
-console.log("Validation passed: seed data shape and readiness scoring are deterministic.");
+console.log("Validation passed: synthetic seed data and scoring are deterministic.");

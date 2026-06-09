@@ -1,65 +1,52 @@
 # Baseframe
 
-Baseframe is a clean-room public TypeScript CLI demo that summarizes a synthetic portfolio of fictional initiatives. It provides a small "portfolio pulse" with deterministic scoring, risk flags, and text or JSON output.
+Baseframe is an original TypeScript CLI demo that builds synthetic launch baseline frames for fictional products. It summarizes readiness signals, dependency status, and next actions so a team can rehearse a launch review using safe sample data.
 
-This project is original demo software for the `baseframe` entry. It does not copy or depend on any private YC, customer, proprietary, scraped, or regulated dataset.
+## Clean-Room Disclaimer
 
-## Disclaimers
+This project is a clean-room public implementation demo. It is not affiliated with, endorsed by, or representative of any real company, accelerator, or YC. All product names, teams, dependencies, audiences, and launch windows are fictional synthetic seed data.
 
-- Clean-room public demo using synthetic data only.
-- Not a regulated, production, compliance, medical, financial, legal, employment, safety-critical, or customer-facing decision system.
-- Output is illustrative and should not be used for real operational, regulated, or production decisions.
-- Seed data is fictional and intentionally small.
+Baseframe is not a production system, regulated workflow, compliance engine, medical device, financial advisor, legal advisor, safety-critical tool, or source of operational truth. Do not use it for regulated, legal, medical, financial, employment, safety, customer, or production decisions.
 
-## Requirements
-
-- Node.js 20 or newer
-- npm
-
-## Install
+## Quick Start
 
 ```bash
 npm install
-```
-
-## Run
-
-Print a readable synthetic portfolio pulse:
-
-```bash
 npm start
 ```
 
-Print JSON output:
+Render JSON:
 
 ```bash
-npm run start:json
+npm start -- --json
 ```
 
-After building, the CLI can also be run directly:
+Render one synthetic product:
 
 ```bash
-node dist/cli.js --help
+npm start -- --product atlas-pulse
 ```
 
-## Test And Validate
-
-Run TypeScript compilation and validation checks:
+List synthetic product IDs:
 
 ```bash
-npm test
+npm start -- --list
 ```
 
-The validation script checks scoring behavior, CLI output, synthetic seed bounds, and clean-room disclaimer text.
+## Scripts
 
-## Project Structure
+- `npm run build` compiles TypeScript into `dist/`.
+- `npm test` builds and runs deterministic validation tests.
+- `npm start` builds and runs the CLI.
 
-- `src/cli.ts` - CLI entry point.
-- `src/core.ts` - scoring, portfolio summary, and text rendering logic.
-- `src/data.ts` - synthetic fictional seed initiatives and clean-room notice.
-- `tests/validate.mjs` - Node-based validation checks run after compilation.
-- `PLAN.md` - implementation plan and clean-room constraints.
+## What It Outputs
 
-## License
+Each launch baseline frame includes:
 
-MIT
+- A fictional product and team.
+- Synthetic launch window and audience.
+- Readiness score and readiness level.
+- Dependency counts by `clear`, `watch`, and `blocked`.
+- Prioritized next actions generated from the weakest readiness signal and dependency status.
+
+The CLI output includes the same clean-room/non-regulated-use disclaimer shown above.

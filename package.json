@@ -1,29 +1,23 @@
 {
   "name": "baseframe",
   "version": "0.1.0",
-  "description": "Clean-room public TypeScript CLI demo for lightweight synthetic project framing.",
-  "type": "module",
+  "description": "Synthetic launch baseline frame builder for fictional product readiness snapshots.",
+  "license": "MIT",
+  "private": false,
+  "type": "commonjs",
   "bin": {
-    "baseframe": "./dist/cli.js"
+    "baseframe": "dist/index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "npm run build && node dist/cli.js",
-    "start:json": "npm run build && node dist/cli.js --json",
-    "test": "npm run build && node tests/validate.mjs"
+    "start": "npm run build --silent && node dist/index.js",
+    "test": "npm run build --silent && node test/baseframe.test.js"
   },
-  "keywords": [
-    "baseframe",
-    "clean-room",
-    "typescript",
-    "cli",
-    "demo"
-  ],
-  "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.4.0"
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   }
 }
