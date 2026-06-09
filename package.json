@@ -1,0 +1,29 @@
+{
+  "name": "baseframe",
+  "version": "0.1.0",
+  "description": "Clean-room public TypeScript CLI demo for lightweight synthetic project framing.",
+  "type": "module",
+  "bin": {
+    "baseframe": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && node dist/cli.js",
+    "start:json": "npm run build && node dist/cli.js --json",
+    "test": "npm run build && node tests/validate.mjs"
+  },
+  "keywords": [
+    "baseframe",
+    "clean-room",
+    "typescript",
+    "cli",
+    "demo"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
