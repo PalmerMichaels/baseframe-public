@@ -1,101 +1,210 @@
-export type Signal = {
-  name: string;
-  score: number;
+export type MockIntegration = {
+  app: string;
+  status: "mocked";
+  records: number;
+  friction: number;
   note: string;
 };
 
-export type Workstream = {
+export type WorkflowTask = {
   name: string;
   owner: string;
-  confidence: number;
-  dependencyCount: number;
-  signals: Signal[];
+  monthlyRuns: number;
+  minutesPerRun: number;
+  repeatability: number;
+  dataReadiness: number;
+  risk: number;
+  effort: number;
+  note: string;
 };
 
-export type Scenario = {
+export type Workflow = {
+  name: string;
+  onboardingNeed: string;
+  apps: string[];
+  tasks: WorkflowTask[];
+};
+
+export type TeamProfile = {
   id: string;
   name: string;
-  horizonDays: number;
-  audience: string;
-  workstreams: Workstream[];
+  stage: string;
+  hourlyCostUsd: number;
+  integrations: MockIntegration[];
+  workflows: Workflow[];
 };
 
 export const cleanRoomDisclaimer =
-  "Clean-room demo using fictional synthetic launch-planning data only. No affiliation with any real company, accelerator, or YC. Not for regulated, legal, medical, financial, safety-critical, or production decisions.";
+  "Clean-room demo using fictional synthetic AI-automation planning data only. Mocked integrations do not connect to private systems. No affiliation with any real company, accelerator, or YC. Not for regulated, legal, medical, financial, compliance, employment, safety-critical, procurement, or production decisions.";
 
-export const scenarios: Scenario[] = [
+export const teams: TeamProfile[] = [
   {
-    id: "atlas-beta",
-    name: "Atlas Beta Launch",
-    horizonDays: 21,
-    audience: "120 invited synthetic design partners",
-    workstreams: [
+    id: "nova-ops",
+    name: "Nova Ops Studio",
+    stage: "Synthetic 42-person operations team",
+    hourlyCostUsd: 68,
+    integrations: [
       {
-        name: "Activation path",
-        owner: "Mira",
-        confidence: 72,
-        dependencyCount: 2,
-        signals: [
-          { name: "first-run checklist", score: 78, note: "Synthetic users complete setup in under eight minutes." },
-          { name: "sample workspace", score: 66, note: "Synthetic demo content needs clearer reset behavior." }
+        app: "MockCRM",
+        status: "mocked",
+        records: 1840,
+        friction: 42,
+        note: "Synthetic accounts include inconsistent renewal fields."
+      },
+      {
+        app: "MockDesk",
+        status: "mocked",
+        records: 620,
+        friction: 35,
+        note: "Synthetic tickets include repetitive onboarding questions."
+      },
+      {
+        app: "MockSheets",
+        status: "mocked",
+        records: 96,
+        friction: 58,
+        note: "Synthetic handoff tabs are manually reconciled each week."
+      }
+    ],
+    workflows: [
+      {
+        name: "Customer onboarding checklist",
+        onboardingNeed: "New coordinators need a single guided path for kickoff, account setup, and handoff notes.",
+        apps: ["MockCRM", "MockDesk", "MockSheets"],
+        tasks: [
+          {
+            name: "Draft kickoff summary",
+            owner: "Mira",
+            monthlyRuns: 54,
+            minutesPerRun: 18,
+            repeatability: 88,
+            dataReadiness: 82,
+            risk: 18,
+            effort: 28,
+            note: "Synthetic notes follow a stable template and can be summarized before human review."
+          },
+          {
+            name: "Reconcile setup fields",
+            owner: "Jonas",
+            monthlyRuns: 48,
+            minutesPerRun: 26,
+            repeatability: 76,
+            dataReadiness: 61,
+            risk: 32,
+            effort: 46,
+            note: "Synthetic records need field-normalization rules before automation."
+          },
+          {
+            name: "Escalate missing owner",
+            owner: "Isha",
+            monthlyRuns: 22,
+            minutesPerRun: 14,
+            repeatability: 69,
+            dataReadiness: 71,
+            risk: 24,
+            effort: 35,
+            note: "Synthetic routing conditions are simple but require approval copy."
+          }
         ]
       },
       {
-        name: "Support loop",
-        owner: "Jonas",
-        confidence: 64,
-        dependencyCount: 4,
-        signals: [
-          { name: "triage coverage", score: 62, note: "Two synthetic escalation paths remain undefined." },
-          { name: "reply templates", score: 71, note: "Synthetic drafts cover expected onboarding questions." }
-        ]
-      },
-      {
-        name: "Launch messaging",
-        owner: "Isha",
-        confidence: 81,
-        dependencyCount: 1,
-        signals: [
-          { name: "positioning review", score: 84, note: "Synthetic reviewers prefer outcome-led copy." },
-          { name: "email dry run", score: 79, note: "Synthetic send list and timing are verified." }
+        name: "Weekly renewal preparation",
+        onboardingNeed: "Account managers need context packs without learning every reporting tab.",
+        apps: ["MockCRM", "MockSheets"],
+        tasks: [
+          {
+            name: "Compile renewal brief",
+            owner: "Leah",
+            monthlyRuns: 38,
+            minutesPerRun: 31,
+            repeatability: 83,
+            dataReadiness: 74,
+            risk: 27,
+            effort: 39,
+            note: "Synthetic briefs combine contract dates, usage notes, and open support items."
+          },
+          {
+            name: "Flag stale success plan",
+            owner: "Theo",
+            monthlyRuns: 30,
+            minutesPerRun: 12,
+            repeatability: 91,
+            dataReadiness: 78,
+            risk: 21,
+            effort: 24,
+            note: "Synthetic stale-plan criteria are deterministic and easy to review."
+          }
         ]
       }
     ]
   },
   {
-    id: "cobalt-migration",
-    name: "Cobalt Migration Pilot",
-    horizonDays: 35,
-    audience: "8 synthetic mid-market accounts",
-    workstreams: [
+    id: "cobalt-people",
+    name: "Cobalt People Lab",
+    stage: "Synthetic 23-person internal enablement team",
+    hourlyCostUsd: 74,
+    integrations: [
       {
-        name: "Importer readiness",
-        owner: "Nia",
-        confidence: 69,
-        dependencyCount: 3,
-        signals: [
-          { name: "fixture coverage", score: 74, note: "Synthetic fixtures include small and large workspaces." },
-          { name: "rollback drill", score: 58, note: "Synthetic rollback owner handoff is not yet rehearsed." }
-        ]
+        app: "MockHRIS",
+        status: "mocked",
+        records: 118,
+        friction: 31,
+        note: "Synthetic profile records omit any real employee or candidate data."
       },
       {
-        name: "Pilot communications",
-        owner: "Theo",
-        confidence: 77,
-        dependencyCount: 1,
-        signals: [
-          { name: "timeline brief", score: 80, note: "Synthetic milestones are visible to all pilot contacts." },
-          { name: "feedback intake", score: 73, note: "Synthetic survey prompts are ready." }
-        ]
+        app: "MockWiki",
+        status: "mocked",
+        records: 244,
+        friction: 49,
+        note: "Synthetic policy pages include duplicate onboarding guidance."
       },
       {
-        name: "Observability",
-        owner: "Leah",
-        confidence: 61,
-        dependencyCount: 5,
-        signals: [
-          { name: "migration dashboard", score: 63, note: "Synthetic lagging status labels need owner review." },
-          { name: "alert routing", score: 55, note: "Synthetic after-hours rota is incomplete." }
+        app: "MockChat",
+        status: "mocked",
+        records: 410,
+        friction: 44,
+        note: "Synthetic channels include repeated benefits and laptop questions."
+      }
+    ],
+    workflows: [
+      {
+        name: "Internal onboarding concierge",
+        onboardingNeed: "New hires need role-specific answers and reminders without exposing private HR records.",
+        apps: ["MockHRIS", "MockWiki", "MockChat"],
+        tasks: [
+          {
+            name: "Answer policy question",
+            owner: "Nia",
+            monthlyRuns: 86,
+            minutesPerRun: 9,
+            repeatability: 92,
+            dataReadiness: 69,
+            risk: 36,
+            effort: 38,
+            note: "Synthetic wiki snippets need citation rules and human-owned escalation."
+          },
+          {
+            name: "Create first-week checklist",
+            owner: "Owen",
+            monthlyRuns: 18,
+            minutesPerRun: 35,
+            repeatability: 81,
+            dataReadiness: 77,
+            risk: 28,
+            effort: 42,
+            note: "Synthetic role templates are structured enough for checklist drafts."
+          },
+          {
+            name: "Route equipment request",
+            owner: "Priya",
+            monthlyRuns: 33,
+            minutesPerRun: 11,
+            repeatability: 87,
+            dataReadiness: 84,
+            risk: 19,
+            effort: 22,
+            note: "Synthetic routing fields are complete and low-risk with approvals."
+          }
         ]
       }
     ]

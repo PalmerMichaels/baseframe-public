@@ -1,92 +1,156 @@
-import { cleanRoomDisclaimer, scenarios, type Scenario, type Workstream } from "./data.ts";
+import { cleanRoomDisclaimer, teams, type TeamProfile, type Workflow, type WorkflowTask } from "./data.ts";
 
-export type WorkstreamAssessment = {
+export type TaskRecommendation = {
   name: string;
   owner: string;
-  readiness: number;
-  dependencyLoad: number;
-  priority: "high" | "medium" | "low";
-  focus: string;
+  workflow: string;
+  score: number;
+  priority: "now" | "next" | "later";
+  monthlyHoursSaved: number;
+  monthlyValueUsd: number;
+  effort: number;
+  recommendation: string;
 };
 
-export type OperatingFrame = {
-  scenario: string;
-  audience: string;
-  horizonDays: number;
-  overallReadiness: number;
-  cadence: string[];
-  assessments: WorkstreamAssessment[];
+export type WorkflowAssessment = {
+  name: string;
+  onboardingNeed: string;
+  apps: string[];
+  averageScore: number;
+  recommendations: TaskRecommendation[];
+};
+
+export type AutomationFrame = {
+  team: string;
+  stage: string;
+  inventory: string[];
+  mockedIntegrations: string[];
+  overallOpportunity: number;
+  roiView: {
+    monthlyHoursSaved: number;
+    monthlyValueUsd: number;
+    effortPoints: number;
+  };
+  workflows: WorkflowAssessment[];
   nextActions: string[];
   disclaimer: string;
 };
 
-export function listScenarios(): Pick<Scenario, "id" | "name" | "horizonDays" | "audience">[] {
-  return scenarios.map(({ id, name, horizonDays, audience }) => ({ id, name, horizonDays, audience }));
+export function listTeams(): Pick<TeamProfile, "id" | "name" | "stage">[] {
+  return teams.map(({ id, name, stage }) => ({ id, name, stage }));
 }
 
-export function findScenario(id: string): Scenario | undefined {
-  return scenarios.find((scenario) => scenario.id === id);
+export function findTeam(id: string): TeamProfile | undefined {
+  return teams.find((team) => team.id === id);
 }
 
-export function createFrame(scenarioId: string): OperatingFrame {
-  const scenario = findScenario(scenarioId);
+export function createAutomationFrame(teamId: string): AutomationFrame {
+  const team = findTeam(teamId);
 
-  if (!scenario) {
-    throw new Error(`Unknown scenario: ${scenarioId}`);
+  if (!team) {
+    throw new Error(`Unknown team profile: ${teamId}`);
   }
 
-  const assessments = scenario.workstreams
-    .map(assessWorkstream)
-    .sort((left, right) => right.dependencyLoad - left.dependencyLoad || left.readiness - right.readiness);
+  const workflows = team.workflows.map((workflow) => assessWorkflow(workflow, team.hourlyCostUsd));
+  const recommendations = workflows.flatMap((workflow) => workflow.recommendations).sort(sortRecommendations);
+  const topRecommendations = recommendations.filter((recommendation) => recommendation.priority !== "later");
 
-  const overallReadiness = Math.round(
-    assessments.reduce((total, assessment) => total + assessment.readiness, 0) / assessments.length
+  const monthlyHoursSaved = roundOne(recommendations.reduce((total, task) => total + task.monthlyHoursSaved, 0));
+  const monthlyValueUsd = Math.round(recommendations.reduce((total, task) => total + task.monthlyValueUsd, 0));
+  const effortPoints = recommendations.reduce((total, task) => total + task.effort, 0);
+  const overallOpportunity = Math.round(
+    recommendations.reduce((total, task) => total + task.score, 0) / recommendations.length
   );
 
   return {
-    scenario: scenario.name,
-    audience: scenario.audience,
-    horizonDays: scenario.horizonDays,
-    overallReadiness,
-    cadence: chooseCadence(overallReadiness, scenario.horizonDays),
-    assessments,
-    nextActions: assessments.slice(0, 3).map((assessment) => `${assessment.owner}: ${assessment.focus}`),
+    team: team.name,
+    stage: team.stage,
+    inventory: team.workflows.map((workflow) => `${workflow.name}: ${workflow.apps.join(", ")}`),
+    mockedIntegrations: team.integrations.map(
+      (integration) => `${integration.app} (${integration.status}, ${integration.records} synthetic records, friction ${integration.friction}/100)`
+    ),
+    overallOpportunity,
+    roiView: {
+      monthlyHoursSaved,
+      monthlyValueUsd,
+      effortPoints
+    },
+    workflows,
+    nextActions: topRecommendations.slice(0, 4).map((task) => `${task.owner}: ${task.recommendation}`),
     disclaimer: cleanRoomDisclaimer
   };
 }
 
-function assessWorkstream(workstream: Workstream): WorkstreamAssessment {
-  const signalAverage = workstream.signals.reduce((total, signal) => total + signal.score, 0) / workstream.signals.length;
-  const dependencyPenalty = Math.min(workstream.dependencyCount * 4, 24);
-  const readiness = clamp(Math.round(workstream.confidence * 0.6 + signalAverage * 0.4 - dependencyPenalty));
-  const weakestSignal = workstream.signals.reduce((weakest, signal) => (signal.score < weakest.score ? signal : weakest));
+function assessWorkflow(workflow: Workflow, hourlyCostUsd: number): WorkflowAssessment {
+  const recommendations = workflow.tasks
+    .map((task) => assessTask(workflow.name, task, hourlyCostUsd))
+    .sort(sortRecommendations);
 
   return {
-    name: workstream.name,
-    owner: workstream.owner,
-    readiness,
-    dependencyLoad: workstream.dependencyCount,
-    priority: readiness < 62 || workstream.dependencyCount >= 4 ? "high" : readiness < 75 ? "medium" : "low",
-    focus: `tighten ${weakestSignal.name}: ${weakestSignal.note}`
+    name: workflow.name,
+    onboardingNeed: workflow.onboardingNeed,
+    apps: workflow.apps,
+    averageScore: Math.round(recommendations.reduce((total, task) => total + task.score, 0) / recommendations.length),
+    recommendations
   };
 }
 
-function chooseCadence(readiness: number, horizonDays: number): string[] {
-  const rituals = ["weekly launch review", "owner-written Friday risk notes"];
+function assessTask(workflow: string, task: WorkflowTask, hourlyCostUsd: number): TaskRecommendation {
+  const monthlyHours = (task.monthlyRuns * task.minutesPerRun) / 60;
+  const automationShare = clamp((task.repeatability + task.dataReadiness - task.risk) / 180, 0.15, 0.85);
+  const monthlyHoursSaved = roundOne(monthlyHours * automationShare);
+  const monthlyValueUsd = Math.round(monthlyHoursSaved * hourlyCostUsd);
+  const score = clampScore(
+    Math.round(
+      task.repeatability * 0.32 +
+        task.dataReadiness * 0.24 +
+        Math.min(monthlyHours, 40) * 0.9 -
+        task.risk * 0.22 -
+        task.effort * 0.18
+    )
+  );
 
-  if (readiness < 65 || horizonDays <= 21) {
-    rituals.unshift("twice-weekly blocker review");
-  }
-
-  if (readiness >= 75) {
-    rituals.push("single pre-launch go/no-go checkpoint");
-  } else {
-    rituals.push("scenario rehearsal before external comms");
-  }
-
-  return rituals;
+  return {
+    name: task.name,
+    owner: task.owner,
+    workflow,
+    score,
+    priority: score >= 52 && task.effort <= 42 ? "now" : score >= 45 ? "next" : "later",
+    monthlyHoursSaved,
+    monthlyValueUsd,
+    effort: task.effort,
+    recommendation: `${task.name} -> ${chooseAutomationPattern(task)}. ${task.note}`
+  };
 }
 
-function clamp(value: number): number {
+function chooseAutomationPattern(task: WorkflowTask): string {
+  if (task.risk >= 34) {
+    return "draft with citations and require human approval";
+  }
+
+  if (task.dataReadiness >= 80 && task.repeatability >= 85) {
+    return "automate routing and first draft generation";
+  }
+
+  if (task.effort >= 40) {
+    return "prototype a guided assistant after normalizing fields";
+  }
+
+  return "start with checklist prompts and exception alerts";
+}
+
+function sortRecommendations(left: TaskRecommendation, right: TaskRecommendation): number {
+  return right.score - left.score || right.monthlyValueUsd - left.monthlyValueUsd;
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.max(minimum, Math.min(maximum, value));
+}
+
+function clampScore(value: number): number {
   return Math.max(0, Math.min(100, value));
+}
+
+function roundOne(value: number): number {
+  return Math.round(value * 10) / 10;
 }

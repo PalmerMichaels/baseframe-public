@@ -1,29 +1,32 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { createFrame, listScenarios } from "../src/frame.ts";
+import { createAutomationFrame, listTeams } from "../src/frame.ts";
 
-describe("baseframe operating frames", () => {
-  it("lists synthetic scenarios", () => {
-    const scenarioList = listScenarios();
+describe("baseframe automation frames", () => {
+  it("lists synthetic team profiles", () => {
+    const teamList = listTeams();
 
-    assert.equal(scenarioList.length, 2);
+    assert.equal(teamList.length, 2);
     assert.deepEqual(
-      scenarioList.map((scenario) => scenario.id),
-      ["atlas-beta", "cobalt-migration"]
+      teamList.map((team) => team.id),
+      ["nova-ops", "cobalt-people"]
     );
   });
 
-  it("creates a prioritized frame", () => {
-    const frame = createFrame("cobalt-migration");
+  it("creates a prioritized automation frame", () => {
+    const frame = createAutomationFrame("nova-ops");
 
-    assert.equal(frame.scenario, "Cobalt Migration Pilot");
-    assert.ok(frame.overallReadiness >= 0 && frame.overallReadiness <= 100);
-    assert.equal(frame.assessments[0].name, "Observability");
-    assert.ok(frame.nextActions[0].includes("Leah"));
-    assert.match(frame.disclaimer, /fictional synthetic/);
+    assert.equal(frame.team, "Nova Ops Studio");
+    assert.ok(frame.overallOpportunity >= 0 && frame.overallOpportunity <= 100);
+    assert.ok(frame.inventory[0].includes("MockCRM"));
+    assert.ok(frame.mockedIntegrations.every((integration) => integration.includes("mocked")));
+    assert.ok(frame.roiView.monthlyHoursSaved > 0);
+    assert.equal(frame.workflows[0].recommendations[0].priority, "now");
+    assert.match(frame.nextActions[0], /Draft kickoff summary|Flag stale success plan/);
+    assert.match(frame.disclaimer, /fictional synthetic AI-automation/);
   });
 
-  it("rejects unknown scenarios", () => {
-    assert.throws(() => createFrame("missing"), /Unknown scenario/);
+  it("rejects unknown team profiles", () => {
+    assert.throws(() => createAutomationFrame("missing"), /Unknown team profile/);
   });
 });

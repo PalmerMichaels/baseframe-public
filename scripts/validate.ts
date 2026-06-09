@@ -1,35 +1,50 @@
 import assert from "node:assert/strict";
-import { cleanRoomDisclaimer, scenarios } from "../src/data.ts";
-import { createFrame } from "../src/frame.ts";
+import { cleanRoomDisclaimer, teams } from "../src/data.ts";
+import { createAutomationFrame } from "../src/frame.ts";
 
 const ids = new Set<string>();
 
-assert.match(cleanRoomDisclaimer, /fictional synthetic/i);
+assert.match(cleanRoomDisclaimer, /fictional synthetic AI-automation/i);
+assert.match(cleanRoomDisclaimer, /Mocked integrations/i);
 assert.match(cleanRoomDisclaimer, /No affiliation/i);
 assert.match(cleanRoomDisclaimer, /Not for regulated/i);
 
-for (const scenario of scenarios) {
-  assert.match(scenario.id, /^[a-z0-9-]+$/);
-  assert.ok(!ids.has(scenario.id), `duplicate scenario id: ${scenario.id}`);
-  ids.add(scenario.id);
-  assert.ok(scenario.horizonDays > 0, `${scenario.id} must have a positive horizon`);
-  assert.ok(scenario.audience.toLowerCase().includes("synthetic"), `${scenario.id} audience should be synthetic`);
-  assert.ok(scenario.workstreams.length >= 2, `${scenario.id} must include multiple workstreams`);
+for (const team of teams) {
+  assert.match(team.id, /^[a-z0-9-]+$/);
+  assert.ok(!ids.has(team.id), `duplicate team id: ${team.id}`);
+  ids.add(team.id);
+  assert.ok(team.stage.toLowerCase().includes("synthetic"), `${team.id} stage should be synthetic`);
+  assert.ok(team.hourlyCostUsd > 0, `${team.id} must have positive ROI assumptions`);
+  assert.ok(team.integrations.length >= 2, `${team.id} must include mocked integrations`);
+  assert.ok(team.workflows.length >= 1, `${team.id} must include workflows`);
 
-  const frame = createFrame(scenario.id);
-  assert.equal(frame.assessments.length, scenario.workstreams.length);
-  assert.ok(frame.cadence.length >= 3, `${scenario.id} must produce a useful cadence`);
+  const frame = createAutomationFrame(team.id);
+  assert.equal(frame.workflows.length, team.workflows.length);
+  assert.ok(frame.inventory.length >= team.workflows.length, `${team.id} must produce inventory`);
+  assert.ok(frame.nextActions.length > 0, `${team.id} must produce next actions`);
+  assert.ok(frame.roiView.monthlyHoursSaved > 0, `${team.id} must produce ROI hours`);
   assert.equal(frame.disclaimer, cleanRoomDisclaimer);
 
-  for (const workstream of scenario.workstreams) {
-    assert.ok(workstream.owner.length > 0, `${scenario.id} workstream needs an owner`);
-    assert.ok(workstream.signals.length >= 2, `${workstream.name} needs at least two signals`);
+  for (const integration of team.integrations) {
+    assert.equal(integration.status, "mocked");
+    assert.ok(integration.note.toLowerCase().includes("synthetic"), `${integration.app} should be synthetic`);
+  }
 
-    for (const signal of workstream.signals) {
-      assert.ok(signal.score >= 0 && signal.score <= 100, `${signal.name} score out of range`);
-      assert.ok(signal.note.toLowerCase().includes("synthetic"), `${signal.name} should be clearly synthetic`);
+  for (const workflow of team.workflows) {
+    assert.ok(workflow.onboardingNeed.length > 20, `${workflow.name} needs onboarding context`);
+    assert.ok(workflow.apps.length > 0, `${workflow.name} needs app inventory`);
+    assert.ok(workflow.tasks.length >= 2, `${workflow.name} needs at least two tasks`);
+
+    for (const task of workflow.tasks) {
+      assert.ok(task.owner.length > 0, `${workflow.name} task needs an owner`);
+      assert.ok(task.monthlyRuns > 0, `${task.name} needs monthly volume`);
+      assert.ok(task.minutesPerRun > 0, `${task.name} needs duration`);
+      assert.ok(task.note.toLowerCase().includes("synthetic"), `${task.name} should be clearly synthetic`);
+      for (const score of [task.repeatability, task.dataReadiness, task.risk, task.effort]) {
+        assert.ok(score >= 0 && score <= 100, `${task.name} score out of range`);
+      }
     }
   }
 }
 
-console.log(`Validated ${scenarios.length} synthetic scenarios.`);
+console.log(`Validated ${teams.length} synthetic automation team profiles.`);

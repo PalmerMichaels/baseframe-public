@@ -1,7 +1,7 @@
 {
   "name": "baseframe",
   "version": "0.1.0",
-  "description": "Synthetic launch operating-frame CLI for clean-room public demos.",
+  "description": "Synthetic AI automation planning CLI for clean-room public demos.",
   "type": "module",
   "private": false,
   "bin": {

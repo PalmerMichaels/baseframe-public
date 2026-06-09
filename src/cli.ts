@@ -1,44 +1,53 @@
 #!/usr/bin/env node
-import { createFrame, listScenarios, type OperatingFrame } from "./frame.ts";
+import { createAutomationFrame, listTeams, type AutomationFrame } from "./frame.ts";
 
-const [command = "help", scenarioId = "atlas-beta"] = process.argv.slice(2);
+const [command = "help", teamId = "nova-ops"] = process.argv.slice(2);
 
 try {
   if (command === "list") {
-    for (const scenario of listScenarios()) {
-      console.log(`${scenario.id} - ${scenario.name} (${scenario.horizonDays} days, ${scenario.audience})`);
+    for (const team of listTeams()) {
+      console.log(`${team.id} - ${team.name} (${team.stage})`);
     }
-  } else if (command === "frame") {
-    console.log(formatFrame(createFrame(scenarioId)));
+  } else if (command === "assess") {
+    console.log(formatFrame(createAutomationFrame(teamId)));
   } else if (command === "json") {
-    console.log(JSON.stringify(createFrame(scenarioId), null, 2));
+    console.log(JSON.stringify(createAutomationFrame(teamId), null, 2));
   } else {
-    console.log(`baseframe\n\nUsage:\n  npm start -- list\n  npm start -- frame <scenario-id>\n  npm start -- json <scenario-id>`);
+    console.log(`baseframe\n\nUsage:\n  npm start -- list\n  npm start -- assess <team-id>\n  npm start -- json <team-id>`);
   }
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;
 }
 
-function formatFrame(frame: OperatingFrame): string {
-  const assessments = frame.assessments
-    .map(
-      (assessment) =>
-        `- ${assessment.name} (${assessment.owner}): ${assessment.readiness}/100, ${assessment.priority} priority, ${assessment.dependencyLoad} dependencies\n  Focus: ${assessment.focus}`
-    )
+function formatFrame(frame: AutomationFrame): string {
+  const workflows = frame.workflows
+    .map((workflow) => {
+      const tasks = workflow.recommendations
+        .map(
+          (task) =>
+            `  - ${task.name} (${task.owner}): ${task.score}/100, ${task.priority}, saves ${task.monthlyHoursSaved}h/mo ($${task.monthlyValueUsd}/mo), effort ${task.effort}\n    ${task.recommendation}`
+        )
+        .join("\n");
+
+      return `- ${workflow.name}: ${workflow.averageScore}/100\n  Onboarding need: ${workflow.onboardingNeed}\n  Apps: ${workflow.apps.join(", ")}\n${tasks}`;
+    })
     .join("\n");
 
   return [
-    `# ${frame.scenario}`,
-    `Audience: ${frame.audience}`,
-    `Horizon: ${frame.horizonDays} days`,
-    `Overall readiness: ${frame.overallReadiness}/100`,
+    `# ${frame.team}`,
+    `Stage: ${frame.stage}`,
+    `Overall automation opportunity: ${frame.overallOpportunity}/100`,
+    `ROI view: ${frame.roiView.monthlyHoursSaved}h/mo saved, $${frame.roiView.monthlyValueUsd}/mo estimated value, ${frame.roiView.effortPoints} effort points`,
     "",
-    "Workstreams:",
-    assessments,
+    "App/workflow inventory:",
+    ...frame.inventory.map((item) => `- ${item}`),
     "",
-    "Cadence:",
-    ...frame.cadence.map((ritual) => `- ${ritual}`),
+    "Mocked integrations:",
+    ...frame.mockedIntegrations.map((integration) => `- ${integration}`),
+    "",
+    "Automation recommendations:",
+    workflows,
     "",
     "Next actions:",
     ...frame.nextActions.map((action) => `- ${action}`),
