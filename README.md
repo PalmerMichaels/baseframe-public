@@ -24,6 +24,8 @@ Commands:
 - Task-level recommendations for drafts, routing, alerts, and guided assistants.
 - ROI/effort views with estimated monthly hours saved, estimated monthly value, and effort points.
 
+The generated text and JSON include an explicit scope-coverage list for onboarding/team context, inventory, scoring, recommendations, ROI/effort, synthetic data, and mocked integrations.
+
 ## Mocked Integrations
 
 The CLI includes static mocked integrations such as `MockCRM`, `MockDesk`, `MockSheets`, `MockHRIS`, `MockWiki`, and `MockChat`. They are local synthetic records only; the app does not request credentials, call private APIs, scrape websites, or connect to external services.

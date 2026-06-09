@@ -23,6 +23,7 @@ export type WorkflowAssessment = {
 export type AutomationFrame = {
   team: string;
   stage: string;
+  scopeCoverage: string[];
   inventory: string[];
   mockedIntegrations: string[];
   overallOpportunity: number;
@@ -65,6 +66,15 @@ export function createAutomationFrame(teamId: string): AutomationFrame {
   return {
     team: team.name,
     stage: team.stage,
+    scopeCoverage: [
+      "onboarding/team context",
+      "app/workflow inventory",
+      "automation opportunity scoring",
+      "task recommendations",
+      "ROI/effort views",
+      "synthetic data",
+      "mocked integrations"
+    ],
     inventory: team.workflows.map((workflow) => `${workflow.name}: ${workflow.apps.join(", ")}`),
     mockedIntegrations: team.integrations.map(
       (integration) => `${integration.app} (${integration.status}, ${integration.records} synthetic records, friction ${integration.friction}/100)`

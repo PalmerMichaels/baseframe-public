@@ -17,6 +17,15 @@ describe("baseframe automation frames", () => {
     const frame = createAutomationFrame("nova-ops");
 
     assert.equal(frame.team, "Nova Ops Studio");
+    assert.deepEqual(frame.scopeCoverage, [
+      "onboarding/team context",
+      "app/workflow inventory",
+      "automation opportunity scoring",
+      "task recommendations",
+      "ROI/effort views",
+      "synthetic data",
+      "mocked integrations"
+    ]);
     assert.ok(frame.overallOpportunity >= 0 && frame.overallOpportunity <= 100);
     assert.ok(frame.inventory[0].includes("MockCRM"));
     assert.ok(frame.mockedIntegrations.every((integration) => integration.includes("mocked")));

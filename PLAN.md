@@ -21,7 +21,7 @@
 
 ## Implementation Steps
 - Define small domain models for teams, workflows, task metrics, onboarding notes, and mocked app integrations.
-- Implement deterministic scoring that balances repeatability, manual hours, app friction, data readiness, risk, effort, and confidence.
+- Implement deterministic scoring that balances repeatability, manual hours, app friction, data readiness, risk, effort, and reviewer certainty.
 - Generate automation recommendations with ROI/effort estimates and suggested task sequencing.
 - Add a CLI entrypoint with `list`, `assess`, and `json` commands.
 - Add local tests with `node --test` and a validation script for seed-data and CLI assumptions.

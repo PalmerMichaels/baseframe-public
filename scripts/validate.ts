@@ -3,6 +3,15 @@ import { cleanRoomDisclaimer, teams } from "../src/data.ts";
 import { createAutomationFrame } from "../src/frame.ts";
 
 const ids = new Set<string>();
+const requiredScope = [
+  "onboarding/team context",
+  "app/workflow inventory",
+  "automation opportunity scoring",
+  "task recommendations",
+  "ROI/effort views",
+  "synthetic data",
+  "mocked integrations"
+];
 
 assert.match(cleanRoomDisclaimer, /fictional synthetic AI-automation/i);
 assert.match(cleanRoomDisclaimer, /Mocked integrations/i);
@@ -20,9 +29,11 @@ for (const team of teams) {
 
   const frame = createAutomationFrame(team.id);
   assert.equal(frame.workflows.length, team.workflows.length);
+  assert.deepEqual(frame.scopeCoverage, requiredScope, `${team.id} must cover the assigned BaseFrame scope`);
   assert.ok(frame.inventory.length >= team.workflows.length, `${team.id} must produce inventory`);
   assert.ok(frame.nextActions.length > 0, `${team.id} must produce next actions`);
   assert.ok(frame.roiView.monthlyHoursSaved > 0, `${team.id} must produce ROI hours`);
+  assert.ok(frame.roiView.effortPoints > 0, `${team.id} must produce effort points`);
   assert.equal(frame.disclaimer, cleanRoomDisclaimer);
 
   for (const integration of team.integrations) {
