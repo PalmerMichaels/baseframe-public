@@ -1,36 +1,46 @@
 #!/usr/bin/env node
-import { cleanRoomNotice, initiatives } from "./data.js";
-import { renderSummary, summarizePortfolio } from "./core.js";
+import { createFrame, listScenarios, type OperatingFrame } from "./frame.ts";
 
-const args = new Set(process.argv.slice(2));
+const [command = "help", scenarioId = "atlas-beta"] = process.argv.slice(2);
 
-if (args.has("--help") || args.has("-h")) {
-  console.log([
-    "baseframe - clean-room synthetic portfolio pulse",
-    "",
-    "Usage:",
-    "  baseframe          Print a readable summary",
-    "  baseframe --json   Print JSON output",
-    "  baseframe --help   Show this help",
-    "",
-    "Disclaimer:",
-    `  ${cleanRoomNotice}`
-  ].join("\n"));
-  process.exit(0);
+try {
+  if (command === "list") {
+    for (const scenario of listScenarios()) {
+      console.log(`${scenario.id} - ${scenario.name} (${scenario.horizonDays} days, ${scenario.audience})`);
+    }
+  } else if (command === "frame") {
+    console.log(formatFrame(createFrame(scenarioId)));
+  } else if (command === "json") {
+    console.log(JSON.stringify(createFrame(scenarioId), null, 2));
+  } else {
+    console.log(`baseframe\n\nUsage:\n  npm start -- list\n  npm start -- frame <scenario-id>\n  npm start -- json <scenario-id>`);
+  }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exitCode = 1;
 }
 
-const unknownArgs = [...args].filter((arg) => arg !== "--json");
+function formatFrame(frame: OperatingFrame): string {
+  const assessments = frame.assessments
+    .map(
+      (assessment) =>
+        `- ${assessment.name} (${assessment.owner}): ${assessment.readiness}/100, ${assessment.priority} priority, ${assessment.dependencyLoad} dependencies\n  Focus: ${assessment.focus}`
+    )
+    .join("\n");
 
-if (unknownArgs.length > 0) {
-  console.error(`Unknown argument: ${unknownArgs.join(", ")}`);
-  console.error("Run `baseframe --help` for usage.");
-  process.exit(1);
-}
-
-const summary = summarizePortfolio(initiatives, cleanRoomNotice);
-
-if (args.has("--json")) {
-  console.log(JSON.stringify(summary, null, 2));
-} else {
-  console.log(renderSummary(summary));
+  return [
+    `# ${frame.scenario}`,
+    `Audience: ${frame.audience}`,
+    `Horizon: ${frame.horizonDays} days`,
+    `Overall readiness: ${frame.overallReadiness}/100`,
+    "",
+    "Workstreams:",
+    assessments,
+    "",
+    "Cadence:",
+    ...frame.cadence.map((ritual) => `- ${ritual}`),
+    "",
+    "Next actions:",
+    ...frame.nextActions.map((action) => `- ${action}`)
+  ].join("\n");
 }

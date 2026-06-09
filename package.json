@@ -1,23 +1,19 @@
 {
   "name": "baseframe",
   "version": "0.1.0",
-  "description": "Synthetic launch baseline frame builder for fictional product readiness snapshots.",
-  "license": "MIT",
+  "description": "Synthetic launch operating-frame CLI for clean-room public demos.",
+  "type": "module",
   "private": false,
-  "type": "commonjs",
   "bin": {
-    "baseframe": "dist/index.js"
+    "baseframe": "./src/cli.ts"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "start": "npm run build --silent && node dist/index.js",
-    "test": "npm run build --silent && node test/baseframe.test.js"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.10",
-    "typescript": "^5.5.3"
+    "start": "node --experimental-strip-types src/cli.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "validate": "node --experimental-strip-types scripts/validate.ts"
   },
   "engines": {
-    "node": ">=18"
-  }
+    "node": ">=22.6"
+  },
+  "license": "MIT"
 }

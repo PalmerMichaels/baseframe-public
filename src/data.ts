@@ -1,61 +1,100 @@
-export type Initiative = {
-  id: string;
+export type Signal = {
   name: string;
-  owner: string;
-  stage: "discovery" | "prototype" | "pilot" | "launch-ready";
-  confidence: number;
-  impact: number;
-  effort: number;
-  lastSignalDaysAgo: number;
-  blockers: string[];
+  score: number;
+  note: string;
 };
 
-export const cleanRoomNotice =
-  "Clean-room public demo using synthetic data only. Not a regulated, production, compliance, medical, financial, legal, or safety-critical system.";
+export type Workstream = {
+  name: string;
+  owner: string;
+  confidence: number;
+  dependencyCount: number;
+  signals: Signal[];
+};
 
-export const initiatives: Initiative[] = [
+export type Scenario = {
+  id: string;
+  name: string;
+  horizonDays: number;
+  audience: string;
+  workstreams: Workstream[];
+};
+
+export const scenarios: Scenario[] = [
   {
-    id: "BF-101",
-    name: "Atlas onboarding frame",
-    owner: "Mira Chen",
-    stage: "pilot",
-    confidence: 0.78,
-    impact: 8,
-    effort: 5,
-    lastSignalDaysAgo: 3,
-    blockers: ["Needs clearer activation metric"]
+    id: "atlas-beta",
+    name: "Atlas Beta Launch",
+    horizonDays: 21,
+    audience: "120 invited synthetic design partners",
+    workstreams: [
+      {
+        name: "Activation path",
+        owner: "Mira",
+        confidence: 72,
+        dependencyCount: 2,
+        signals: [
+          { name: "first-run checklist", score: 78, note: "Synthetic users complete setup in under eight minutes." },
+          { name: "sample workspace", score: 66, note: "Synthetic demo content needs clearer reset behavior." }
+        ]
+      },
+      {
+        name: "Support loop",
+        owner: "Jonas",
+        confidence: 64,
+        dependencyCount: 4,
+        signals: [
+          { name: "triage coverage", score: 62, note: "Two synthetic escalation paths remain undefined." },
+          { name: "reply templates", score: 71, note: "Synthetic drafts cover expected onboarding questions." }
+        ]
+      },
+      {
+        name: "Launch messaging",
+        owner: "Isha",
+        confidence: 81,
+        dependencyCount: 1,
+        signals: [
+          { name: "positioning review", score: 84, note: "Synthetic reviewers prefer outcome-led copy." },
+          { name: "email dry run", score: 79, note: "Synthetic send list and timing are verified." }
+        ]
+      }
+    ]
   },
   {
-    id: "BF-118",
-    name: "Signal review loop",
-    owner: "Jon Bell",
-    stage: "prototype",
-    confidence: 0.62,
-    impact: 7,
-    effort: 3,
-    lastSignalDaysAgo: 11,
-    blockers: []
-  },
-  {
-    id: "BF-124",
-    name: "Northstar brief builder",
-    owner: "Asha Patel",
-    stage: "discovery",
-    confidence: 0.44,
-    impact: 9,
-    effort: 7,
-    lastSignalDaysAgo: 18,
-    blockers: ["Unvalidated audience", "High implementation uncertainty"]
-  },
-  {
-    id: "BF-137",
-    name: "Launch readiness pulse",
-    owner: "Theo Morgan",
-    stage: "launch-ready",
-    confidence: 0.86,
-    impact: 6,
-    effort: 4,
-    lastSignalDaysAgo: 1,
-    blockers: []
+    id: "cobalt-migration",
+    name: "Cobalt Migration Pilot",
+    horizonDays: 35,
+    audience: "8 synthetic mid-market accounts",
+    workstreams: [
+      {
+        name: "Importer readiness",
+        owner: "Nia",
+        confidence: 69,
+        dependencyCount: 3,
+        signals: [
+          { name: "fixture coverage", score: 74, note: "Synthetic fixtures include small and large workspaces." },
+          { name: "rollback drill", score: 58, note: "Synthetic rollback owner handoff is not yet rehearsed." }
+        ]
+      },
+      {
+        name: "Pilot communications",
+        owner: "Theo",
+        confidence: 77,
+        dependencyCount: 1,
+        signals: [
+          { name: "timeline brief", score: 80, note: "Synthetic milestones are visible to all pilot contacts." },
+          { name: "feedback intake", score: 73, note: "Synthetic survey prompts are ready." }
+        ]
+      },
+      {
+        name: "Observability",
+        owner: "Leah",
+        confidence: 61,
+        dependencyCount: 5,
+        signals: [
+          { name: "migration dashboard", score: 63, note: "Synthetic lagging status labels need owner review." },
+          { name: "alert routing", score: 55, note: "Synthetic after-hours rota is incomplete." }
+        ]
+      }
+    ]
   }
 ];
